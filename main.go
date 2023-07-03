@@ -1,29 +1,20 @@
 package main
 
 import (
-	"CurrencyNotifications/Structs"
+	"CurrencyNotifications/Functions"
 	"CurrencyNotifications/Tokens"
-	"encoding/json"
 	"fmt"
-	"io"
-	"log"
-	"net/http"
+	"time"
 )
 
-func Polling(TgToken string) string {
-	resp, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/getUpdates", TgToken))
-	if err != nil {
-		log.Fatal(err)
-	}
-	body, err := io.ReadAll(resp.Body)
-	var req Structs.Req
-	err = json.Unmarshal(body, &req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return req.Result[0].Message.Text
-}
-
 func main() {
-	fmt.Println(Polling(Tokens.TgToken))
+	for {
+		msg, id := Functions.Polling(Tokens.TgToken)
+		fmt.Println(msg)
+		fmt.Println(id)
+		if msg == "/set" {
+			Functions.SendMessage(Tokens.TgToken, "Put+text+of+message+here", id)
+		}
+		time.Sleep(time.Second)
+	}
 }
